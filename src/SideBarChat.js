@@ -2,13 +2,19 @@ import React, { useEffect, useState } from "react";
 import "./SideBarChat.css";
 import { Avatar } from "@mui/material";
 import { db } from "./firebase";
-import { collection, addDoc,onSnapshot, orderBy, query } from "firebase/firestore";
+import {
+  collection,
+  addDoc,
+  onSnapshot,
+  orderBy,
+  query,
+} from "firebase/firestore";
 
-import { Link} from "react-router-dom";
+import { Link } from "react-router-dom";
 
 const SideBarChat = ({ addNewChat, id, name }) => {
   const [seed, setSeed] = useState("");
-  const [messages,setMessages] = useState([])
+  const [messages, setMessages] = useState([]);
 
   useEffect(() => {
     if (id) {
@@ -22,7 +28,6 @@ const SideBarChat = ({ addNewChat, id, name }) => {
       return () => unsubscribe();
     }
   }, [id]);
-
 
   useEffect(() => {
     setSeed(Math.floor(Math.random() * 5000));
@@ -47,7 +52,11 @@ const SideBarChat = ({ addNewChat, id, name }) => {
         <Avatar src={`https://robohash.org/${seed}`} />
         <div className="sidebarChat__info">
           <h2>{name}</h2>
-          <p>{messages[0]?.message}</p>
+          {messages[0]?.message?.length > 20 ? (
+            <p>{`${(messages[0]?.message).slice(0, 18)}...`}</p>
+          ) : (
+            <p>{`${messages[0]?.message}`}</p>
+          )}
         </div>
       </div>
     </Link>
