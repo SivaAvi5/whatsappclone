@@ -16,7 +16,7 @@ import { useStateValue } from "./StateProvider";
 const SideBar = () => {
 
   const [rooms,setRooms] = useState([])
-  const [{user}, dispatch] = useStateValue()
+  const [{user}] = useStateValue()
 
   useEffect(() => {
     const unsubscribe = onSnapshot(collection(db, 'rooms'), (snapshot) => {

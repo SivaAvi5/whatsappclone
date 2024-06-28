@@ -1,4 +1,3 @@
-import { useState } from "react";
 import "./App.css";
 import Chat from "./Chat";
 import SideBar from "./SideBar";
@@ -8,7 +7,7 @@ import { useStateValue } from "./StateProvider";
 
 
 function App() {
-  const [{ user }, dispatch] = useStateValue();
+  const [{ user }] = useStateValue();
 
   return (
     <div className="app">
@@ -28,12 +27,5 @@ function App() {
     </div>
   );
 }
-
-const AppLayout = () => (
-  <>
-    <SideBar />
-    <Chat />
-  </>
-);
 
 export default App;
