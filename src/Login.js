@@ -5,6 +5,7 @@ import { auth, provider } from "./firebase";
 import { signInWithPopup } from "firebase/auth";
 import { useStateValue } from "./StateProvider";
 import { actionTypes } from "./reducer";
+import logo from "./img/logo.svg";
 
 const Login = () => {
   // eslint-disable-next-line no-unused-vars
@@ -23,13 +24,9 @@ const Login = () => {
   return (
     <div className="login">
       <div className="login__container">
-        <img
-          src="https://static.vecteezy.com/system/resources/previews/023/986/631/non_2x/whatsapp-logo-whatsapp-logo-transparent-whatsapp-icon-transparent-free-free-png.png"
-          height="400px"
-          alt=""
-        />
+        <img src={logo} height="700px" alt="" />
         <div className="login__text">
-          <h1>Sign in to WhatsApp</h1>
+          <h2>Sign into ChatApp</h2>
         </div>
         <Button type="submit" onClick={signIn}>
           Sign In With Google

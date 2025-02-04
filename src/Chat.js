@@ -3,12 +3,14 @@ import "./Chat.css";
 import { Avatar, IconButton } from "@mui/material";
 import {
   AttachFile,
+  Delete,
   InsertEmoticon,
   Mic,
   MoreVert,
   SearchOutlined,
+  Send,
 } from "@mui/icons-material";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { db } from "./firebase";
 import {
   doc,
@@ -18,6 +20,7 @@ import {
   onSnapshot,
   addDoc,
   serverTimestamp,
+  deleteDoc,
 } from "firebase/firestore";
 import { useStateValue } from "./StateProvider";
 
@@ -27,12 +30,18 @@ const Chat = () => {
   const { roomId } = useParams();
   const [roomName, setRoomName] = useState();
   const [messages, setMessages] = useState([]);
-  const [{user}] = useStateValue()
+  const [{ user }] = useStateValue();
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (roomId) {
       const unsubscribe = onSnapshot(doc(db, "rooms", roomId), (snapshot) => {
-        setRoomName(snapshot.data().name);
+        if (snapshot.exists()) {
+          setRoomName(snapshot.data().name);
+        } else {
+          console.warn("Room not found:", roomId);
+          setRoomName("Unknown Room"); // Set a fallback value
+        }
       });
 
       const messagesQuery = query(
@@ -55,7 +64,7 @@ const Chat = () => {
     setSeed(Math.floor(Math.random() * 5000));
   }, [roomId]);
 
-  const sendMessage = async(e) => {
+  const sendMessage = async (e) => {
     e.preventDefault();
 
     if (roomId && input) {
@@ -68,17 +77,32 @@ const Chat = () => {
     }
   };
 
+  const deleteRoom = async () => {
+    if (window.confirm("Are you sure you want to delete this room?")) {
+      try {
+        await deleteDoc(doc(db, "rooms", roomId));
+        alert("Room deleted successfully");
+        navigate("/"); // Redirect to home or another page after deletion
+      } catch (error) {
+        console.error("Error deleting room: ", error);
+      }
+    }
+  };
+
   return (
     <div className="chat">
       <div className="chat__header">
         <Avatar src={`https://robohash.org/${seed}`} />
         <div className="chat__headerInfo">
-          <h3>{roomName}</h3>
-          <p>last seen{" "}{
-            new Date(
-              messages[messages.length-1]?.timestamp?.toDate()
-            ).toUTCString()
-          }</p>
+          <h3>{roomName || "Loading..."}</h3>
+          <p>
+            last seen{" "}
+            {messages.length > 0 && messages[messages.length - 1]?.timestamp
+              ? new Date(
+                  messages[messages.length - 1]?.timestamp?.toDate()
+                ).toUTCString()
+              : "N/A"}
+          </p>
         </div>
         <div className="chat__headerRight">
           <IconButton>
@@ -90,12 +114,20 @@ const Chat = () => {
           <IconButton>
             <MoreVert />
           </IconButton>
+          <IconButton onClick={(e) => deleteRoom()}>
+            <Delete />
+          </IconButton>
         </div>
       </div>
 
       <div className="chat__body">
-        {messages.map((message,index) => (
-          <p key={index} className={`chat__message ${message.name === user.displayName && "chat__reciever"}`}>
+        {messages.map((message, index) => (
+          <p
+            key={index}
+            className={`chat__message ${
+              message.name === user.displayName && "chat__reciever"
+            }`}
+          >
             <span className="chat__name">{message.name}</span>
             {message.message}
             <span className="chat__timestamp">
@@ -114,7 +146,8 @@ const Chat = () => {
             placeholder="Type a message"
             type="text"
           />
-          <button onClick={sendMessage}>Send</button>
+
+          <Send onClick={sendMessage} />
           <Mic />
         </form>
       </div>

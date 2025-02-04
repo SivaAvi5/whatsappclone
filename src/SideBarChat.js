@@ -11,6 +11,7 @@ import {
 } from "firebase/firestore";
 
 import { Link } from "react-router-dom";
+import { Add } from "@mui/icons-material";
 
 const SideBarChat = ({ addNewChat, id, name }) => {
   const [seed, setSeed] = useState("");
@@ -40,6 +41,7 @@ const SideBarChat = ({ addNewChat, id, name }) => {
         await addDoc(collection(db, "rooms"), {
           name: roomName,
         });
+        console.log("added");
       } catch (e) {
         console.error("Error adding document: ", e);
       }
@@ -61,8 +63,9 @@ const SideBarChat = ({ addNewChat, id, name }) => {
       </div>
     </Link>
   ) : (
-    <div onClick={createChat} className="sidebarChat">
+    <div onClick={createChat} className="sidebarChat addNew">
       <h2>Add new chat</h2>
+      <Add />
     </div>
   );
 };
